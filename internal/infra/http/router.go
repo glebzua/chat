@@ -52,6 +52,8 @@ func Router(cont container.Container) http.Handler {
 
 				UserRouter(apiRouter, cont.UserController, cont.UserService)
 				ContactsRouter(apiRouter, cont.ContactsController, cont.UserService)
+				MessagesRouter(apiRouter, cont.MessagesController, cont.UserService)
+
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
 		})
@@ -119,6 +121,31 @@ func UserRouter(r chi.Router, uc controllers.UserController, us app.UserService)
 func ContactsRouter(r chi.Router, cc controllers.ContactsController, us app.UserService) {
 	uom := middlewares.PathObject("id", controllers.PathUserKey, us)
 	r.Route("/contacts", func(apiRouter chi.Router) {
+		apiRouter.Get(
+			"/my",
+			cc.FindAllMy(),
+		)
+		apiRouter.With(uom).Delete(
+			"/{id}",
+			cc.Delete(),
+		)
+		apiRouter.With(uom).Get(
+			"/{id}",
+			cc.FindOne(),
+		)
+		apiRouter.Post(
+			"/",
+			cc.Create(),
+		)
+		apiRouter.Get(
+			"/",
+			cc.FindAll(),
+		)
+	})
+}
+func MessagesRouter(r chi.Router, cc controllers.MessagesController, us app.UserService) {
+	uom := middlewares.PathObject("id", controllers.PathUserKey, us)
+	r.Route("/messages", func(apiRouter chi.Router) {
 		apiRouter.Get(
 			"/my",
 			cc.FindAllMy(),
