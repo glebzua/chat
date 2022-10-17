@@ -27,12 +27,14 @@ type Services struct {
 	app.UserService
 	app.AuthService
 	app.ContactsService
+	app.MessagesService
 }
 
 type Controllers struct {
 	controllers.UserController
 	controllers.AuthController
 	controllers.ContactsController
+	controllers.MessagesController
 }
 
 func New(conf config.Configuration) Container {
@@ -41,10 +43,12 @@ func New(conf config.Configuration) Container {
 
 	userRepository := database.NewUserRepository(sess)
 	contactsRepository := database.NewContactsRepository(sess)
+	messagesRepository := database.NewMessagesRepository(sess)
 	sessionRepository := database.NewSessRepository(sess)
 
 	userService := app.NewUserService(userRepository)
 	contactsService := app.NewContactsService(contactsRepository)
+	messagesService := app.NewMessagesService(messagesRepository, contactsService)
 	authService := app.NewAuthService(sessionRepository, userService, conf, tknAuth)
 
 	authMiddleware := middlewares.AuthMiddleware(tknAuth, authService, userService)
@@ -52,7 +56,7 @@ func New(conf config.Configuration) Container {
 	authController := controllers.NewAuthController(authService, userService)
 	userController := controllers.NewUserController(userService)
 	contactsController := controllers.NewContactsController(contactsService)
-
+	messagesController := controllers.NewMessagesController(messagesService)
 	return Container{
 		Middlewares: Middlewares{
 			AuthMw: authMiddleware,
@@ -61,11 +65,13 @@ func New(conf config.Configuration) Container {
 			userService,
 			authService,
 			contactsService,
+			messagesService,
 		},
 		Controllers: Controllers{
 			userController,
 			authController,
 			contactsController,
+			messagesController,
 		},
 	}
 }

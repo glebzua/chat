@@ -57,7 +57,7 @@ func (c ContactsController) FindAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
 		if err != nil {
-			log.Println("Client FindAll error: ", err)
+			log.Println("contactsController FindAll error: ", err)
 			BadRequest(w, err)
 			return
 		}
@@ -92,7 +92,7 @@ func (c ContactsController) Create() http.HandlerFunc {
 
 		cnt, err := requests.Bind(r, requests.ContactRequest{}, domain.Contact{})
 		if err != nil {
-			log.Printf("ContactsController Create: %s", err)
+			log.Printf("contactsController Create: %s", err)
 			BadRequest(w, err)
 			return
 		}
