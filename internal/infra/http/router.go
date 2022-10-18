@@ -150,6 +150,14 @@ func MessagesRouter(r chi.Router, cc controllers.MessagesController, us app.User
 			"/my",
 			cc.FindAllMy(),
 		)
+		apiRouter.Get(
+			"/chats",
+			cc.FindAllMyChats(),
+		)
+		apiRouter.Get(
+			"/chat",
+			cc.FindAllMessagesInChat(),
+		)
 		apiRouter.With(uom).Delete(
 			"/{id}",
 			cc.Delete(),

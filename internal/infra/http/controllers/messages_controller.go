@@ -5,6 +5,7 @@ import (
 	"chatprjkt/internal/domain"
 	"chatprjkt/internal/infra/requests"
 	"chatprjkt/internal/infra/resources"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -50,6 +51,61 @@ func (c MessagesController) FindAllMy() http.HandlerFunc {
 
 	}
 }
+func (c MessagesController) FindAllMyChats() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(UserKey).(domain.User)
+		msg, err := (c.messagesService).FindAllForId(user.Id)
+		if err != nil {
+			log.Print(err)
+			InternalServerError(w, err)
+			return
+		}
+		var chats domain.Chats
+		var chat domain.Chat
+		keys := make(map[string]bool)
+		var uniq []any
+
+		for _, entry := range msg.Items {
+			if _, value := keys[entry.ChatId]; !value {
+				keys[entry.ChatId] = true
+				uniq = append(uniq, entry.ChatId, entry.RecipientId)
+				log.Println("string(entry.RecipientId)", entry.RecipientId)
+				log.Println("entry.RecipientId)", entry.RecipientId)
+				log.Println("entry.ChatId)", entry.ChatId)
+				chat.ChatId = entry.ChatId
+				chat.RecipientId = entry.RecipientId
+				chats.Items = append(chats.Items, chat)
+			}
+		}
+		log.Println("uniq=", uniq)
+		var ChatDto resources.ChatDto
+		success(w, ChatDto.DomainToDtoCollection(chats))
+
+	}
+}
+
+func (c MessagesController) FindAllMessagesInChat() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		chatId := r.URL.Query().Get("chatId")
+		if chatId == "" {
+			log.Println("messagesController FindAll error: ", chatId)
+			BadRequest(w, fmt.Errorf(" messagesController: %v", chatId))
+			return
+		}
+		user := r.Context().Value(UserKey).(domain.User)
+		msg, err := (c.messagesService).FindAllMessagesInChat(user.Id, chatId)
+		if err != nil {
+			log.Print(err)
+			InternalServerError(w, err)
+			return
+		}
+
+		var MessageDto resources.MessageDto
+		success(w, MessageDto.DomainToDtoCollection(msg))
+
+	}
+}
+
 func (c MessagesController) FindAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)

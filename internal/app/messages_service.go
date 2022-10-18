@@ -10,6 +10,7 @@ import (
 type MessagesService interface {
 	FindAll(pageSize, page uint) (domain.Messages, error)
 	FindAllForId(id int64) (domain.Messages, error)
+	FindAllMessagesInChat(userId int64, chatId string) (domain.Messages, error)
 	Save(item domain.Message) (domain.Message, error)
 	Find(id int64) (interface{}, error)
 	FindById(id int64) (domain.Message, error)
@@ -72,6 +73,23 @@ func (s messagesService) FindAllForId(id int64) (domain.Messages, error) {
 		}
 		messages.Items = append(messages.Items, message.Items...)
 	}
+	return messages, nil
+}
+func (s messagesService) FindAllMessagesInChat(id int64, chatId string) (domain.Messages, error) {
+	messages, err := s.messagesRepo.FindAllMessagesInChat(id, chatId)
+	if err != nil {
+		log.Printf("messagesService: %s", err)
+		return domain.Messages{}, err
+	}
+	//var messages domain.Messages
+	//for _, chat := range contacts.Items {
+	//	message, err := s.messagesRepo.FindAllForId(chat.ChatId)
+	//	if err != nil {
+	//		log.Printf("messagesService: %s", err)
+	//		return domain.Messages{}, err
+	//	}
+	//	messages.Items = append(messages.Items, message.Items...)
+	//}
 	return messages, nil
 }
 
