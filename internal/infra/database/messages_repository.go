@@ -27,6 +27,7 @@ type MessagesRepository interface {
 	Save(domainItem domain.Message) (domain.Message, error)
 	FindAll(pageSize, page uint) (domain.Messages, error)
 	FindAllForId(id string) (domain.Messages, error)
+	FindAllMessagesInChat(id int64, chatId string) (domain.Messages, error)
 	FindById(id int64) (domain.Message, error)
 	Delete(id int64) error
 }
@@ -72,6 +73,16 @@ func (r messagesRepository) FindAllForId(chatId string) (domain.Messages, error)
 	return r.mapModelToDomainCollection(message), nil
 }
 
+func (r messagesRepository) FindAllMessagesInChat(_ int64, chatId string) (domain.Messages, error) {
+	var message []messages
+	messageCond := db.Cond{"chatid": chatId}
+	err := r.coll.Find(messageCond).All(&message)
+	if err != nil {
+		return domain.Messages{}, err
+	}
+
+	return r.mapModelToDomainCollection(message), nil
+}
 func (r messagesRepository) FindById(id int64) (domain.Message, error) {
 	var u messages
 
@@ -96,6 +107,9 @@ func (r messagesRepository) mapDomainToModel(d domain.Message) messages {
 		Message:     d.Message,
 		Sended:      d.Sended,
 		Received:    d.Received,
+		CreatedDate: d.CreatedDate,
+		UpdatedDate: d.UpdatedDate,
+		DeletedDate: d.DeletedDate,
 	}
 }
 
