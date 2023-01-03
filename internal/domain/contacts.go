@@ -13,6 +13,7 @@ type Contact struct {
 	CreatedDate time.Time
 	UpdatedDate time.Time
 	DeletedDate *time.Time
+	Nickname    string
 }
 
 type Contacts struct {
