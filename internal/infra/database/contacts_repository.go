@@ -15,6 +15,7 @@ type contacts struct {
 	ContactId   int64      `db:"contactid,omitempty"`
 	Activated   bool       `db:"activated"`
 	ChatId      string     `db:"chatid"`
+	Nickname    string     `db:"nickname"`
 	CreatedDate time.Time  `db:"created_date,omitempty"`
 	UpdatedDate time.Time  `db:"updated_date,omitempty"`
 	DeletedDate *time.Time `db:"deleted_date,omitempty"`
@@ -90,11 +91,13 @@ func (r contactsRepository) Delete(id int64) error {
 
 func (r contactsRepository) mapDomainToModel(d domain.Contact) contacts {
 	return contacts{
-		Id:        d.Id,
-		UserId:    d.UserId,
-		ContactId: d.ContactId,
-		Activated: d.Activated,
-		ChatId:    d.ChatId,
+		Id:          d.Id,
+		UserId:      d.UserId,
+		ContactId:   d.ContactId,
+		Activated:   d.Activated,
+		ChatId:      d.ChatId,
+		Nickname:    d.Nickname,
+		CreatedDate: d.CreatedDate,
 	}
 }
 
@@ -108,6 +111,7 @@ func (r contactsRepository) mapModelToDomain(m contacts) domain.Contact {
 		CreatedDate: m.CreatedDate,
 		UpdatedDate: m.UpdatedDate,
 		DeletedDate: m.DeletedDate,
+		Nickname:    m.Nickname,
 	}
 }
 

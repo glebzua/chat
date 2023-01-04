@@ -13,6 +13,7 @@ type CreateRequest struct {
 	Password    string `json:"password" validate:"required,alphanum,gte=6"`
 	Name        string `json:"name" validate:"required"`
 	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	Nickname    string `json:"nickname" validate:"required"`
 }
 
 type RegisterRequest struct {
@@ -20,6 +21,7 @@ type RegisterRequest struct {
 	Password    string `json:"password" validate:"required,alphanum,gte=6"`
 	Name        string `json:"name" validate:"required"`
 	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	Nickname    string `json:"nickname" validate:"required"`
 }
 
 type AuthRequest struct {

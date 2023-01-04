@@ -4,7 +4,6 @@ import (
 	"chatprjkt/internal/domain"
 	"fmt"
 	"github.com/upper/db/v4"
-	"log"
 	"time"
 )
 
@@ -50,7 +49,7 @@ func (r messagesRepository) Save(domainMessages domain.Message) (domain.Message,
 	if err != nil {
 		return domain.Message{}, fmt.Errorf("Messages repository Save: %w", err)
 	}
-	log.Println("ff")
+
 	return r.mapModelToDomain(s), nil
 }
 func (r messagesRepository) FindAll(pageSize, page uint) (domain.Messages, error) {

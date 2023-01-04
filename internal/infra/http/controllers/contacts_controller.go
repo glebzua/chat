@@ -96,7 +96,10 @@ func (c ContactsController) Create() http.HandlerFunc {
 			BadRequest(w, err)
 			return
 		}
+		log.Println(cnt)
 		cnt.UserId = user.Id
+		log.Println(cnt.Nickname)
+
 		alreadyInList, err := (c.contactsService).FindAllForId(cnt.UserId)
 		if err != nil {
 			log.Print(err)
@@ -105,8 +108,8 @@ func (c ContactsController) Create() http.HandlerFunc {
 		}
 		for i := 0; i < len(alreadyInList.Items); i++ {
 			if alreadyInList.Items[i].ContactId == cnt.ContactId {
-				log.Print("already in list of contacts, waiting for confirm")
-				err = fmt.Errorf("already in list of contacts, waiting for confirm")
+				log.Print("already in list of contacts or waiting for confirm request")
+				err = fmt.Errorf("already in list of contacts or waiting for confirm request")
 
 				BadRequest(w, err)
 				return
