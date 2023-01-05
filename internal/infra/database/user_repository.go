@@ -1,7 +1,10 @@
 package database
 
 import (
+	"chatprjkt/config"
 	"chatprjkt/internal/domain"
+	"fmt"
+	"github.com/pusher/pusher-http-go/v5"
 	"github.com/upper/db/v4"
 	"time"
 )
@@ -33,21 +36,28 @@ type UserRepository interface {
 }
 
 type userRepository struct {
-	coll db.Collection
+	coll         db.Collection
+	pusherConfig pusher.Client
 }
 
-func NewUserRepository(dbSession db.Session) UserRepository {
+func NewUserRepository(dbSession db.Session, cf config.Configuration) UserRepository {
 	return userRepository{
-		coll: dbSession.Collection(UsersTableName),
+		pusherConfig: cf.Pusher,
+		coll:         dbSession.Collection(UsersTableName),
 	}
 }
 
 func (r userRepository) Save(user domain.User) (domain.User, error) {
 	u := r.mapDomainToModel(user)
-
+	client := r.pusherConfig
+	data := map[string]string{"message": " add to contacts new user" + user.Name}
+	err := client.Trigger("my-channel", "my-event", data)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 	u.CreatedDate = time.Now()
 	u.UpdatedDate = time.Now()
-	err := r.coll.InsertReturning(&u)
+	err = r.coll.InsertReturning(&u)
 	if err != nil {
 		return domain.User{}, err
 	}

@@ -41,7 +41,7 @@ func New(conf config.Configuration) Container {
 	tknAuth := jwtauth.New("HS256", []byte(conf.JwtSecret), nil)
 	sess := getDbSess(conf)
 
-	userRepository := database.NewUserRepository(sess)
+	userRepository := database.NewUserRepository(sess, conf)
 	contactsRepository := database.NewContactsRepository(sess)
 	messagesRepository := database.NewMessagesRepository(sess)
 	sessionRepository := database.NewSessRepository(sess)
