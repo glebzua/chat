@@ -3,6 +3,7 @@ package app
 import (
 	"chatprjkt/internal/domain"
 	"chatprjkt/internal/infra/database"
+	"chatprjkt/internal/infra/resources"
 	"log"
 
 	"golang.org/x/crypto/bcrypt"
@@ -20,12 +21,14 @@ type UserService interface {
 }
 
 type userService struct {
-	userRepo database.UserRepository
+	userRepo      database.UserRepository
+	pusherService PusherService
 }
 
-func NewUserService(ur database.UserRepository) UserService {
+func NewUserService(ur database.UserRepository, ps PusherService) UserService {
 	return userService{
-		userRepo: ur,
+		userRepo:      ur,
+		pusherService: ps,
 	}
 }
 
@@ -34,7 +37,7 @@ func (s userService) Save(user domain.User) (domain.User, error) {
 
 	user.Password, err = s.generatePasswordHash(user.Password)
 	if err != nil {
-		log.Printf("UserService: %s", err)
+		log.Printf("UserService generatePasswordHash: %s", err)
 		return domain.User{}, err
 	}
 	user.Activated = true
@@ -42,17 +45,18 @@ func (s userService) Save(user domain.User) (domain.User, error) {
 
 	u, err := s.userRepo.Save(user)
 	if err != nil {
-		log.Printf("UserService: %s", err)
+		log.Printf("UserService Save: %s", err)
 		return domain.User{}, err
 	}
-
+	var userDto resources.UserDto
+	s.pusherService.Save(userDto.DomainToDto(user))
 	return u, err
 }
 
 func (s userService) FindAll(pageSize, page uint) (domain.Users, error) {
 	users, err := s.userRepo.FindAll(pageSize, page)
 	if err != nil {
-		log.Printf("UserService: %s", err)
+		log.Printf("UserService FindAll: %s", err)
 		return domain.Users{}, err
 	}
 
@@ -62,7 +66,7 @@ func (s userService) FindAll(pageSize, page uint) (domain.Users, error) {
 func (s userService) Find(id int64) (interface{}, error) {
 	user, err := s.userRepo.FindById(id)
 	if err != nil {
-		log.Printf("UserService: %s", err)
+		log.Printf("UserService Find: %s", err)
 		return nil, err
 	}
 
@@ -72,7 +76,7 @@ func (s userService) Find(id int64) (interface{}, error) {
 func (s userService) FindById(id int64) (domain.User, error) {
 	user, err := s.userRepo.FindById(id)
 	if err != nil {
-		log.Printf("UserService: %s", err)
+		log.Printf("UserService FindById: %s", err)
 		return domain.User{}, err
 	}
 
@@ -82,7 +86,7 @@ func (s userService) FindById(id int64) (domain.User, error) {
 func (s userService) FindByEmail(email string) (domain.User, error) {
 	user, err := s.userRepo.FindByEmail(email)
 	if err != nil {
-		log.Printf("UserService: %s", err)
+		log.Printf("UserService FindByEmail: %s", err)
 		return domain.User{}, err
 	}
 
@@ -103,7 +107,7 @@ func (s userService) Update(user domain.User, req domain.User) (domain.User, err
 
 	user, err = s.userRepo.Update(user)
 	if err != nil {
-		log.Printf("UserService: %s", err)
+		log.Printf("UserService Update: %s", err)
 		return domain.User{}, err
 	}
 

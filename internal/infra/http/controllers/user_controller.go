@@ -34,19 +34,11 @@ func (c UserController) Save() http.HandlerFunc {
 			BadRequest(w, err)
 			return
 		}
-
+		//
 		var userDto resources.UserDto
 		created(w, userDto.DomainToDto(user))
 	}
 }
-
-//func (c UserController) FindMe() http.HandlerFunc {
-//	return func(w http.ResponseWriter, r *http.Request) {
-//		user := r.Context().Value(UserKey).(domain.User)
-//
-//		success(w, resources.UserDto{}.DomainToDto(user))
-//	}
-//}
 
 func (c UserController) Update() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
