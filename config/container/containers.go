@@ -28,6 +28,7 @@ type Services struct {
 	app.AuthService
 	app.ContactsService
 	app.MessagesService
+	app.PusherService
 }
 
 type Controllers struct {
@@ -35,18 +36,21 @@ type Controllers struct {
 	controllers.AuthController
 	controllers.ContactsController
 	controllers.MessagesController
+	controllers.PusherController
 }
 
 func New(conf config.Configuration) Container {
 	tknAuth := jwtauth.New("HS256", []byte(conf.JwtSecret), nil)
 	sess := getDbSess(conf)
 
-	userRepository := database.NewUserRepository(sess, conf)
+	userRepository := database.NewUserRepository(sess)
 	contactsRepository := database.NewContactsRepository(sess)
 	messagesRepository := database.NewMessagesRepository(sess)
 	sessionRepository := database.NewSessRepository(sess)
+	pusherRepository := database.NewPusherRepository(conf.Pusher)
 
-	userService := app.NewUserService(userRepository)
+	pusherService := app.NewPusherService(pusherRepository)
+	userService := app.NewUserService(userRepository, pusherService)
 	contactsService := app.NewContactsService(contactsRepository)
 	messagesService := app.NewMessagesService(messagesRepository, contactsService)
 	authService := app.NewAuthService(sessionRepository, userService, conf, tknAuth)
@@ -57,6 +61,7 @@ func New(conf config.Configuration) Container {
 	userController := controllers.NewUserController(userService)
 	contactsController := controllers.NewContactsController(contactsService)
 	messagesController := controllers.NewMessagesController(messagesService)
+	pusherController := controllers.NewPusherController(pusherService)
 	return Container{
 		Middlewares: Middlewares{
 			AuthMw: authMiddleware,
@@ -66,12 +71,14 @@ func New(conf config.Configuration) Container {
 			authService,
 			contactsService,
 			messagesService,
+			pusherService,
 		},
 		Controllers: Controllers{
 			userController,
 			authController,
 			contactsController,
 			messagesController,
+			pusherController,
 		},
 	}
 }
