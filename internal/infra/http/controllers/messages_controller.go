@@ -162,3 +162,18 @@ func (c MessagesController) Create() http.HandlerFunc {
 		created(w, msgDto.DomainToDto(msg))
 	}
 }
+func (c MessagesController) FindAllChatsWithUnreadMsg() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := r.Context().Value(UserKey).(domain.User)
+
+		msg, err := (c.messagesService).FindAllChatsWithUnreadMsg(user.Id)
+		if err != nil {
+			log.Print(err)
+			InternalServerError(w, err)
+			return
+		}
+		var msgDto resources.MessageDto
+		success(w, msgDto.DomainToDtoCollection(msg))
+
+	}
+}

@@ -155,6 +155,10 @@ func MessagesRouter(r chi.Router, cc controllers.MessagesController, us app.User
 			cc.FindAllMyChats(),
 		)
 		apiRouter.Get(
+			"/uchats",
+			cc.FindAllChatsWithUnreadMsg(),
+		)
+		apiRouter.Get(
 			"/chat",
 			cc.FindAllMessagesInChat(),
 		)

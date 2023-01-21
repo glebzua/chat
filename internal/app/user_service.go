@@ -49,7 +49,7 @@ func (s userService) Save(user domain.User) (domain.User, error) {
 		return domain.User{}, err
 	}
 	var userDto resources.UserDto
-	s.pusherService.Save(userDto.DomainToDto(user))
+	s.pusherService.NewUser(userDto.DomainToDto(user))
 	return u, err
 }
 

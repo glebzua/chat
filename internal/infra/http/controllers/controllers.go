@@ -55,6 +55,21 @@ func BadRequest(w http.ResponseWriter, err error) {
 	encodeErrorBody(w, err)
 }
 
+func NotFound(w http.ResponseWriter, err error) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusNotFound)
+
+	body := "Not Found"
+
+	if err != nil {
+		body = fmt.Sprint(err)
+	}
+
+	e := json.NewEncoder(w).Encode(map[string]interface{}{"error": body})
+	if e != nil {
+		log.Print(e)
+	}
+}
 func Forbidden(w http.ResponseWriter, err error) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusForbidden)
@@ -83,22 +98,6 @@ func genericError(w http.ResponseWriter, err error) {
 	w.WriteHeader(http.StatusBadRequest)
 
 	encodeErrorBody(w, err)
-}
-
-func NotFound(w http.ResponseWriter, err error) {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusNotFound)
-
-	body := "Not Found"
-
-	if err != nil {
-		body = fmt.Sprint(err)
-	}
-
-	e := json.NewEncoder(w).Encode(map[string]interface{}{"error": body})
-	if e != nil {
-		log.Print(e)
-	}
 }
 
 func encodeErrorBody(w http.ResponseWriter, err error) {
