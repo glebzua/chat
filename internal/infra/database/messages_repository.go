@@ -28,7 +28,10 @@ type MessagesRepository interface {
 	FindAllForId(id string) (domain.Messages, error)
 	FindAllMessagesInChat(id int64, chatId string) (domain.Messages, error)
 	FindById(id int64) (domain.Message, error)
+	FindAllChatsWithUnreadMsg(chatId string, userId int64) (domain.Message, error)
+
 	Delete(id int64) error
+	MarkReceivedMessages(id int64, chatId string) error
 }
 
 type messagesRepository struct {
@@ -69,19 +72,62 @@ func (r messagesRepository) FindAllForId(chatId string) (domain.Messages, error)
 	if err != nil {
 		return domain.Messages{}, err
 	}
+
 	return r.mapModelToDomainCollection(message), nil
 }
+func (r messagesRepository) FindAllChatsWithUnreadMsg(chatId string, userId int64) (domain.Message, error) {
+	if chatId == "                                                            " {
+		return domain.Message{}, nil
+	}
+	var message []messages
 
-func (r messagesRepository) FindAllMessagesInChat(_ int64, chatId string) (domain.Messages, error) {
+	messageCond := db.Cond{"chatid": chatId, "recipientid": userId, "received": false}
+	err := r.coll.Find(messageCond).All(&message)
+
+	if err == db.ErrNoMoreRows {
+		return domain.Message{}, nil
+	}
+	if err != nil {
+		return domain.Message{}, err
+	}
+	if len(message) == 0 {
+		return domain.Message{}, err
+	}
+
+	return r.mapModelToDomain(message[0]), nil
+
+	//c := r.coll.Session().SQL().Select().Distinct("chatid")
+	//if c != nil {
+	//	return domain.Chats{}, err
+	//}
+	//log.Println("entry.RecipientId)", c)
+	//return domain.Chats{}, nil
+}
+
+func (r messagesRepository) FindAllMessagesInChat(userId int64, chatId string) (domain.Messages, error) {
 	var message []messages
 	messageCond := db.Cond{"chatid": chatId}
-	err := r.coll.Find(messageCond).All(&message)
+	//messageCond := db.Cond{"chatid": chatId}
+	err := r.coll.Find(messageCond).OrderBy("-created_date").All(&message)
 	if err != nil {
 		return domain.Messages{}, err
 	}
-
+	err = r.MarkReceivedMessages(userId, chatId)
+	if err != nil {
+		return domain.Messages{}, err
+	}
 	return r.mapModelToDomainCollection(message), nil
 }
+func (r messagesRepository) MarkReceivedMessages(recipientId int64, chatId string) error {
+
+	messageCond := db.Cond{"chatid": chatId, "received": false, "recipientid": recipientId}
+	err := r.coll.Find(messageCond).Update(map[string]interface{}{"received": true, "updated_date": time.Now()})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r messagesRepository) FindById(id int64) (domain.Message, error) {
 	var u messages
 

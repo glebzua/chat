@@ -3,6 +3,7 @@ package app
 import (
 	"chatprjkt/internal/domain"
 	"chatprjkt/internal/infra/database"
+	"chatprjkt/internal/infra/resources"
 	"fmt"
 	"log"
 )
@@ -14,19 +15,21 @@ type MessagesService interface {
 	Save(item domain.Message) (domain.Message, error)
 	Find(id int64) (interface{}, error)
 	FindById(id int64) (domain.Message, error)
-
+	FindAllChatsWithUnreadMsg(userId int64) (domain.Messages, error)
 	Delete(id int64, sess domain.Session) error
 }
 
 type messagesService struct {
 	messagesRepo    database.MessagesRepository
 	contactsService ContactsService
+	pusherService   PusherService
 }
 
-func NewMessagesService(mr database.MessagesRepository, cs ContactsService) MessagesService {
+func NewMessagesService(mr database.MessagesRepository, cs ContactsService, ps PusherService) MessagesService {
 	return messagesService{
 		messagesRepo:    mr,
 		contactsService: cs,
+		pusherService:   ps,
 	}
 }
 func (s messagesService) Save(item domain.Message) (domain.Message, error) {
@@ -42,10 +45,12 @@ func (s messagesService) Save(item domain.Message) (domain.Message, error) {
 			if err != nil {
 				return domain.Message{}, fmt.Errorf("messagesService Save: %w", err)
 			}
+			s.pusherService.NewMessage(resources.MessageDto(result))
 			return result, err
 		}
 	}
 	err = fmt.Errorf("recipient or ChatId incorrect")
+
 	return result, err
 }
 
@@ -58,38 +63,13 @@ func (s messagesService) FindAll(pageSize, page uint) (domain.Messages, error) {
 
 	return contacts, nil
 }
-func (s messagesService) FindAllForId(id int64) (domain.Messages, error) {
-	contacts, err := s.contactsService.FindAllForId(id)
-	if err != nil {
-		log.Printf("contactsService: %s", err)
-		return domain.Messages{}, err
-	}
-	var messages domain.Messages
-	for _, chat := range contacts.Items {
-		message, err := s.messagesRepo.FindAllForId(chat.ChatId)
-		if err != nil {
-			log.Printf("messagesService: %s", err)
-			return domain.Messages{}, err
-		}
-		messages.Items = append(messages.Items, message.Items...)
-	}
-	return messages, nil
-}
+
 func (s messagesService) FindAllMessagesInChat(id int64, chatId string) (domain.Messages, error) {
 	messages, err := s.messagesRepo.FindAllMessagesInChat(id, chatId)
 	if err != nil {
 		log.Printf("messagesService: %s", err)
 		return domain.Messages{}, err
 	}
-	//var messages domain.Messages
-	//for _, chat := range contacts.Items {
-	//	message, err := s.messagesRepo.FindAllForId(chat.ChatId)
-	//	if err != nil {
-	//		log.Printf("messagesService: %s", err)
-	//		return domain.Messages{}, err
-	//	}
-	//	messages.Items = append(messages.Items, message.Items...)
-	//}
 	return messages, nil
 }
 
@@ -114,3 +94,56 @@ func (s messagesService) Delete(id int64, sess domain.Session) error {
 
 	return nil
 }
+func (s messagesService) FindAllForId(id int64) (domain.Messages, error) {
+	contacts, err := s.contactsService.FindAllForId(id)
+	if err != nil {
+		log.Printf("contactsService: %s", err)
+		return domain.Messages{}, err
+	}
+	var messages domain.Messages
+	for _, chat := range contacts.Items {
+		message, err := s.messagesRepo.FindAllForId(chat.ChatId)
+		if err != nil {
+			log.Printf("messagesService: %s", err)
+			return domain.Messages{}, err
+		}
+		messages.Items = append(messages.Items, message.Items...)
+	}
+	return messages, nil
+}
+func (s messagesService) FindAllChatsWithUnreadMsg(id int64) (domain.Messages, error) {
+	contacts, err := s.contactsService.FindAllForId(id)
+	if err != nil {
+		log.Printf("messagesService.FindAllForId: %s", err)
+		return domain.Messages{}, err
+	}
+	var unreadChats domain.Messages
+	for _, chat := range contacts.Items {
+		unreadChat, err := s.messagesRepo.FindAllChatsWithUnreadMsg(chat.ChatId, id)
+		if err != nil {
+			log.Printf("messagesService:.messagesRepo.FindAllChatsWithUnreadMsg %s", err)
+			return domain.Messages{}, err
+		}
+		unreadChats.Items = append(unreadChats.Items, unreadChat)
+	}
+	s.pusherService.UnreadMessages(unreadChats)
+	//s.pusherService.UnreadMessages(unreadChats)
+	return unreadChats, nil
+}
+
+//	contacts, err := s.contactsService.FindAllForId(id)
+//	if err != nil {
+//		log.Printf("contactsService: %s", err)
+//		return domain.Messages{}, err
+//	}
+//	var messages domain.Messages
+//	for _, chat := range contacts.Items {
+//		message, err := s.messagesRepo.FindAllChatsWithUnreadMsg(chat.ChatId, id)
+//		if err != nil {
+//			log.Printf("messagesService: %s", err)
+//			return domain.Messages{}, err
+//		}
+//		messages.Items = append(messages.Items, message)
+//	}
+//	return messages, nil
+//}

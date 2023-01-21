@@ -52,7 +52,7 @@ func New(conf config.Configuration) Container {
 	pusherService := app.NewPusherService(pusherRepository)
 	userService := app.NewUserService(userRepository, pusherService)
 	contactsService := app.NewContactsService(contactsRepository)
-	messagesService := app.NewMessagesService(messagesRepository, contactsService)
+	messagesService := app.NewMessagesService(messagesRepository, contactsService, pusherService)
 	authService := app.NewAuthService(sessionRepository, userService, conf, tknAuth)
 
 	authMiddleware := middlewares.AuthMiddleware(tknAuth, authService, userService)
