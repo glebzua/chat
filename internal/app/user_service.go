@@ -11,7 +11,8 @@ import (
 
 type UserService interface {
 	Save(user domain.User) (domain.User, error)
-	FindAll(pageSize, page uint) (domain.Users, error)
+	FindAll() (domain.Users, error)
+	//FindAll(pageSize, page uint) (domain.Users, error)
 	Find(id int64) (interface{}, error)
 	FindById(id int64) (domain.User, error)
 	FindByEmail(email string) (domain.User, error)
@@ -53,8 +54,8 @@ func (s userService) Save(user domain.User) (domain.User, error) {
 	return u, err
 }
 
-func (s userService) FindAll(pageSize, page uint) (domain.Users, error) {
-	users, err := s.userRepo.FindAll(pageSize, page)
+func (s userService) FindAll() (domain.Users, error) {
+	users, err := s.userRepo.FindAll()
 	if err != nil {
 		log.Printf("UserService FindAll: %s", err)
 		return domain.Users{}, err
@@ -63,6 +64,15 @@ func (s userService) FindAll(pageSize, page uint) (domain.Users, error) {
 	return users, nil
 }
 
+//	func (s userService) FindAll(pageSize, page uint) (domain.Users, error) {
+//		users, err := s.userRepo.FindAll(pageSize, page)
+//		if err != nil {
+//			log.Printf("UserService FindAll: %s", err)
+//			return domain.Users{}, err
+//		}
+//
+//		return users, nil
+//	}
 func (s userService) Find(id int64) (interface{}, error) {
 	user, err := s.userRepo.FindById(id)
 	if err != nil {

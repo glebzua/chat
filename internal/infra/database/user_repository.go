@@ -24,7 +24,8 @@ type user struct {
 
 type UserRepository interface {
 	Save(user domain.User) (domain.User, error)
-	FindAll(pageSize, page uint) (domain.Users, error)
+	FindAll() (domain.Users, error)
+	//FindAll(pageSize, page uint) (domain.Users, error)
 	FindById(id int64) (domain.User, error)
 	FindByEmail(email string) (domain.User, error)
 	Update(user domain.User) (domain.User, error)
@@ -55,10 +56,10 @@ func (r userRepository) Save(user domain.User) (domain.User, error) {
 	return r.mapModelToDomain(u), nil
 }
 
-func (r userRepository) FindAll(pageSize, page uint) (domain.Users, error) {
+func (r userRepository) FindAll() (domain.Users, error) {
 	var users []user
 
-	err := r.coll.Find().Paginate(pageSize).Page(page).All(&users)
+	err := r.coll.Find().All(&users)
 	if err != nil {
 		return domain.Users{}, err
 	}
@@ -66,6 +67,16 @@ func (r userRepository) FindAll(pageSize, page uint) (domain.Users, error) {
 	return r.mapModelToDomainCollection(users), nil
 }
 
+//	func (r userRepository) FindAll(pageSize, page uint) (domain.Users, error) {
+//		var users []user
+//
+//		err := r.coll.Find().Paginate(pageSize).Page(page).All(&users)
+//		if err != nil {
+//			return domain.Users{}, err
+//		}
+//
+//		return r.mapModelToDomainCollection(users), nil
+//	}
 func (r userRepository) FindById(id int64) (domain.User, error) {
 	var u user
 

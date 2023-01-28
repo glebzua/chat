@@ -7,7 +7,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"chatprjkt/internal/app"
@@ -53,26 +52,42 @@ func (c ContactsController) FindAllMy() http.HandlerFunc {
 
 	}
 }
-func (c ContactsController) FindAll() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
-		if err != nil {
-			log.Println("contactsController FindAll error: ", err)
-			BadRequest(w, err)
-			return
-		}
 
-		cnt, err := (c.contactsService).FindAll(20, uint(page))
-		if err != nil {
-			log.Print(err)
-			InternalServerError(w, err)
-			return
-		}
-		var cntDto resources.ContactDto
-		success(w, cntDto.DomainToDtoCollection(cnt))
+//func (c ContactsController) FindAll() http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		cnt, err := (c.contactsService).FindAll()
+//		if err != nil {
+//			log.Print(err)
+//			InternalServerError(w, err)
+//			return
+//		}
+//		var cntDto resources.ContactDto
+//		success(w, cntDto.DomainToDtoCollection(cnt))
+//
+//	}
+//}
 
-	}
-}
+//func (c ContactsController) FindAll() http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
+//		if err != nil {
+//			log.Println("contactsController FindAll error: ", err)
+//			BadRequest(w, err)
+//			return
+//		}
+//
+//		cnt, err := (c.contactsService).FindAll(20, uint(page))
+//		if err != nil {
+//			log.Print(err)
+//			InternalServerError(w, err)
+//			return
+//		}
+//		var cntDto resources.ContactDto
+//		success(w, cntDto.DomainToDtoCollection(cnt))
+//
+//	}
+//}
+
 func (c ContactsController) FindOne() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		contact := r.Context().Value(PathUserKey).(domain.User)
