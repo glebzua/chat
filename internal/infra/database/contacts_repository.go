@@ -23,7 +23,8 @@ type contacts struct {
 
 type ContactsRepository interface {
 	Save(domainItem domain.Contact) (domain.Contact, error)
-	FindAll(pageSize, page uint) (domain.Contacts, error)
+	//FindAll() (domain.Contacts, error)
+	//FindAll(pageSize, page uint) (domain.Contacts, error)
 	FindAllForId(id int64) (domain.Contacts, error)
 	FindById(id int64) (domain.Contact, error)
 	Delete(id int64) error
@@ -50,16 +51,28 @@ func (r contactsRepository) Save(domainContact domain.Contact) (domain.Contact, 
 
 	return r.mapModelToDomain(s), nil
 }
-func (r contactsRepository) FindAll(pageSize, page uint) (domain.Contacts, error) {
-	var contact []contacts
 
-	err := r.coll.Find().Paginate(pageSize).Page(page).All(&contact)
-	if err != nil {
-		return domain.Contacts{}, err
-	}
+//func (r contactsRepository) FindAll() (domain.Contacts, error) {
+//	var contact []contacts
+//
+//	err := r.coll.Find().All(&contact)
+//	if err != nil {
+//		return domain.Contacts{}, err
+//	}
+//
+//	return r.mapModelToDomainCollection(contact), nil
+//}
 
-	return r.mapModelToDomainCollection(contact), nil
-}
+//	func (r contactsRepository) FindAll(pageSize, page uint) (domain.Contacts, error) {
+//		var contact []contacts
+//
+//		err := r.coll.Find().Paginate(pageSize).Page(page).All(&contact)
+//		if err != nil {
+//			return domain.Contacts{}, err
+//		}
+//
+//		return r.mapModelToDomainCollection(contact), nil
+//	}
 func (r contactsRepository) FindAllForId(userId int64) (domain.Contacts, error) {
 	var contact []contacts
 	contactCond := db.Cond{"userid": userId}

@@ -7,7 +7,6 @@ import (
 	"chatprjkt/internal/infra/resources"
 	"log"
 	"net/http"
-	"strconv"
 )
 
 type UserController struct {
@@ -93,13 +92,8 @@ func (c UserController) FindMe() http.HandlerFunc {
 
 func (c UserController) FindAll() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
-		if err != nil {
-			log.Println("Client FindAll error: ", err)
-			BadRequest(w, err)
-			return
-		}
-		usr, err := (c.userService).FindAll(20, uint(page))
+
+		usr, err := (c.userService).FindAll()
 		if err != nil {
 			log.Print(err)
 			InternalServerError(w, err)
@@ -109,6 +103,25 @@ func (c UserController) FindAll() http.HandlerFunc {
 
 	}
 }
+
+//	func (c UserController) FindAll() http.HandlerFunc {
+//		return func(w http.ResponseWriter, r *http.Request) {
+//			page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
+//			if err != nil {
+//				log.Println("Client FindAll error: ", err)
+//				BadRequest(w, err)
+//				return
+//			}
+//			usr, err := (c.userService).FindAll(20, uint(page))
+//			if err != nil {
+//				log.Print(err)
+//				InternalServerError(w, err)
+//				return
+//			}
+//			success(w, resources.UserInfoDto{}.DomainToDtoCollection(usr))
+//
+//		}
+//	}
 func (c UserController) FindOne() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 

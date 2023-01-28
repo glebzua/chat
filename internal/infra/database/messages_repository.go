@@ -107,7 +107,6 @@ func (r messagesRepository) FindAllChatsWithUnreadMsg(chatId string, userId int6
 func (r messagesRepository) FindAllMessagesInChat(userId int64, chatId string) (domain.Messages, error) {
 	var message []messages
 	messageCond := db.Cond{"chatid": chatId}
-	//messageCond := db.Cond{"chatid": chatId}
 	err := r.coll.Find(messageCond).OrderBy("-created_date").All(&message)
 	if err != nil {
 		return domain.Messages{}, err

@@ -137,10 +137,10 @@ func ContactsRouter(r chi.Router, cc controllers.ContactsController, us app.User
 			"/",
 			cc.Create(),
 		)
-		apiRouter.Get(
-			"/",
-			cc.FindAll(),
-		)
+		//apiRouter.Get(
+		//	"/",
+		//	cc.FindAll(),
+		//)
 	})
 }
 func MessagesRouter(r chi.Router, cc controllers.MessagesController, us app.UserService) {

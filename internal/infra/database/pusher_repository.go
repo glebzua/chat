@@ -8,8 +8,6 @@ import (
 	"strconv"
 )
 
-//const pusherTableName = "pushers"
-
 type PusherRepository interface {
 	NewUser(dto resources.UserDto)
 	NewMessage(dto resources.MessageDto)
@@ -48,10 +46,7 @@ func (p pusherRepository) NewMessage(dto resources.MessageDto) {
 }
 
 func (p pusherRepository) UnreadMessages(dto domain.Messages) {
-	//fmt.Println(dto)
 	client := p.pusherConfig
-
-	//var unreadChats domain.Messages
 	for _, unreadMessage := range dto.Items {
 		data := map[string]int64{"NewMessageFrom": unreadMessage.SenderId}
 		err := client.Trigger(strconv.FormatInt(unreadMessage.RecipientId, 10), "NewMessage", data)
@@ -59,30 +54,5 @@ func (p pusherRepository) UnreadMessages(dto domain.Messages) {
 			fmt.Println("error in trigger", strconv.FormatInt(unreadMessage.RecipientId, 10))
 			fmt.Println(err.Error())
 		}
-
-		//
-		//	unreadChat, err := s.messagesRepo.FindAllChatsWithUnreadMsg(chat.ChatId, id)
-		//	if err != nil {
-		//		log.Printf("messagesService:.messagesRepo.FindAllChatsWithUnreadMsg %s", err)
-		//		return domain.Messages{}, err
-		//	}
-		//	unreadChats.Items = append(unreadChats.Items, unreadChat)
-		//}
-		//client := p.pusherConfig
-		//var message []MessagesDto
-		//
-		//for _, c := range dto. {
-		//	var dto MessageDto
-		//	messageDto := dto.DomainToDto(c)
-		//	result = append(result, messageDto)
-		//}
-		//
-		//data := map[string]int64{"NewMessageFrom": dto.SenderId}
-		//err := client.Trigger(strconv.FormatInt(dto.RecipientId, 10), "NewMessage", data)
-		//if err != nil {
-		//	fmt.Println("error in trigger", strconv.FormatInt(dto.RecipientId, 10))
-		//	fmt.Println(err.Error())
-		//}
-
 	}
 }

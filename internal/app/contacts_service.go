@@ -9,7 +9,8 @@ import (
 )
 
 type ContactsService interface {
-	FindAll(pageSize, page uint) (domain.Contacts, error)
+	//FindAll() (domain.Contacts, error)
+	//FindAll(pageSize, page uint) (domain.Contacts, error)
 	FindAllForId(id int64) (domain.Contacts, error)
 	Save(item domain.Contact) (domain.Contact, error)
 	Find(id int64) (interface{}, error)
@@ -37,15 +38,25 @@ func (s contactsService) Save(item domain.Contact) (domain.Contact, error) {
 	return result, err
 }
 
-func (s contactsService) FindAll(pageSize, page uint) (domain.Contacts, error) {
-	contacts, err := s.contactsRepo.FindAll(pageSize, page)
-	if err != nil {
-		log.Printf("contactsService: %s", err)
-		return domain.Contacts{}, err
-	}
+//func (s contactsService) FindAll() (domain.Contacts, error) {
+//	contacts, err := s.contactsRepo.FindAll()
+//	if err != nil {
+//		log.Printf("contactsService: %s", err)
+//		return domain.Contacts{}, err
+//	}
+//
+//	return contacts, nil
+//}
 
-	return contacts, nil
-}
+//	func (s contactsService) FindAll(pageSize, page uint) (domain.Contacts, error) {
+//		contacts, err := s.contactsRepo.FindAll(pageSize, page)
+//		if err != nil {
+//			log.Printf("contactsService: %s", err)
+//			return domain.Contacts{}, err
+//		}
+//
+//		return contacts, nil
+//	}
 func (s contactsService) FindAllForId(id int64) (domain.Contacts, error) {
 	contacts, err := s.contactsRepo.FindAllForId(id)
 	if err != nil {
