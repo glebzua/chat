@@ -27,8 +27,9 @@ func (p pusherRepository) NewUser(dto resources.UserDto) {
 
 	client := p.pusherConfig
 
-	data := map[string]string{"message from pusherRepository": fmt.Sprintf("add to contacts new user %s ", dto.Name)}
-	err := client.Trigger("my-channel", "my-event", data)
+	data := map[string]string{"new user registered": fmt.Sprintf(" %s", dto.Name)}
+	err := client.Trigger("my-channel", "new-user", data)
+
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -39,6 +40,7 @@ func (p pusherRepository) NewMessage(dto resources.MessageDto) {
 
 	data := map[string]int64{"NewMessageFrom": dto.SenderId}
 	err := client.Trigger(strconv.FormatInt(dto.RecipientId, 10), "NewMessage", data)
+
 	if err != nil {
 		fmt.Println("error in trigger", strconv.FormatInt(dto.RecipientId, 10))
 		fmt.Println(err.Error())
