@@ -15,7 +15,7 @@ const (
 	UserKey     = "user"
 	SessKey     = "sess"
 	PathUserKey = "pathUser"
-	ContactsKey = "contacts"
+	PathImgKey  = "pathImg"
 )
 
 func ok(w http.ResponseWriter) {
@@ -43,6 +43,13 @@ func created(w http.ResponseWriter, body interface{}) {
 	}
 }
 
+func createdImage(w http.ResponseWriter, data []byte) {
+	//w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type", "application/octet-stream")
+	w.WriteHeader(http.StatusCreated)
+	w.Write(data)
+
+}
 func noContent(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusNoContent)

@@ -10,6 +10,7 @@ type Message struct {
 	SenderId    int64
 	RecipientId int64
 	Message     string
+	FileLoc     string
 	Sended      bool
 	Received    bool
 	CreatedDate time.Time

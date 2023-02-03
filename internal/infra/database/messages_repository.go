@@ -15,6 +15,7 @@ type messages struct {
 	SenderId    int64      `db:"senderid,"`
 	RecipientId int64      `db:"recipientid"`
 	Message     string     `db:"message"`
+	FileLoc     string     `db:"fileloc"`
 	Sended      bool       `db:"sended"`
 	Received    bool       `db:"received"`
 	CreatedDate time.Time  `db:"created_date,omitempty"`
@@ -149,6 +150,7 @@ func (r messagesRepository) mapDomainToModel(d domain.Message) messages {
 		SenderId:    d.SenderId,
 		RecipientId: d.RecipientId,
 		Message:     d.Message,
+		FileLoc:     d.FileLoc,
 		Sended:      d.Sended,
 		Received:    d.Received,
 		CreatedDate: d.CreatedDate,
@@ -164,6 +166,7 @@ func (r messagesRepository) mapModelToDomain(m messages) domain.Message {
 		SenderId:    m.SenderId,
 		RecipientId: m.RecipientId,
 		Message:     m.Message,
+		FileLoc:     m.FileLoc,
 		Sended:      m.Sended,
 		Received:    m.Received,
 		CreatedDate: m.CreatedDate,

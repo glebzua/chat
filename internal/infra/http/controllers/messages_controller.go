@@ -3,8 +3,8 @@ package controllers
 import (
 	"chatprjkt/internal/app"
 	"chatprjkt/internal/domain"
-	"chatprjkt/internal/infra/requests"
-	"chatprjkt/internal/infra/resources"
+	"chatprjkt/internal/infra/http/requests"
+	"chatprjkt/internal/infra/http/resources"
 	"fmt"
 	"log"
 	"net/http"
