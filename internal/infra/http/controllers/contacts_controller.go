@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"chatprjkt/internal/infra/requests"
-	"chatprjkt/internal/infra/resources"
+	requests2 "chatprjkt/internal/infra/http/requests"
+	"chatprjkt/internal/infra/http/resources"
 	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	"log"
@@ -105,7 +105,7 @@ func (c ContactsController) Create() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user := r.Context().Value(UserKey).(domain.User)
 
-		cnt, err := requests.Bind(r, requests.ContactRequest{}, domain.Contact{})
+		cnt, err := requests2.Bind(r, requests2.ContactRequest{}, domain.Contact{})
 		if err != nil {
 			log.Printf("contactsController Create: %s", err)
 			BadRequest(w, err)

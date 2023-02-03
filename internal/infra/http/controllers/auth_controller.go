@@ -3,8 +3,8 @@ package controllers
 import (
 	"chatprjkt/internal/app"
 	"chatprjkt/internal/domain"
-	"chatprjkt/internal/infra/requests"
-	"chatprjkt/internal/infra/resources"
+	requests2 "chatprjkt/internal/infra/http/requests"
+	"chatprjkt/internal/infra/http/resources"
 	"errors"
 
 	"log"
@@ -25,7 +25,7 @@ func NewAuthController(as app.AuthService, us app.UserService) AuthController {
 
 func (c AuthController) Register() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user, err := requests.Bind(r, requests.RegisterRequest{}, domain.User{})
+		user, err := requests2.Bind(r, requests2.RegisterRequest{}, domain.User{})
 		if err != nil {
 			log.Printf("AuthController: %s", err)
 			BadRequest(w, errors.New("invalid request body"))
@@ -46,7 +46,7 @@ func (c AuthController) Register() http.HandlerFunc {
 
 func (c AuthController) Login() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		user, err := requests.Bind(r, requests.AuthRequest{}, domain.User{})
+		user, err := requests2.Bind(r, requests2.AuthRequest{}, domain.User{})
 		if err != nil {
 			log.Printf("AuthController: %s", err)
 			BadRequest(w, err)
@@ -80,7 +80,7 @@ func (c AuthController) Logout() http.HandlerFunc {
 
 func (c AuthController) ChangePassword() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		req, err := requests.Bind(r, requests.ChangePasswordRequest{}, domain.ChangePassword{})
+		req, err := requests2.Bind(r, requests2.ChangePasswordRequest{}, domain.ChangePassword{})
 		if err != nil {
 			log.Printf("AuthController: %s", err)
 			BadRequest(w, err)

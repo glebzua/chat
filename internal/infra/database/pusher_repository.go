@@ -2,7 +2,7 @@ package database
 
 import (
 	"chatprjkt/internal/domain"
-	"chatprjkt/internal/infra/resources"
+	"chatprjkt/internal/infra/http/resources"
 	"fmt"
 	"github.com/pusher/pusher-http-go/v5"
 	"strconv"

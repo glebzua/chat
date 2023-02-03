@@ -4,6 +4,7 @@ import (
 	"chatprjkt/config"
 	"chatprjkt/config/container"
 	"chatprjkt/internal/app"
+	"chatprjkt/internal/domain"
 	"chatprjkt/internal/infra/http/controllers"
 	"chatprjkt/internal/infra/http/middlewares"
 
@@ -53,6 +54,7 @@ func Router(cont container.Container) http.Handler {
 				UserRouter(apiRouter, cont.UserController, cont.UserService)
 				ContactsRouter(apiRouter, cont.ContactsController, cont.UserService)
 				MessagesRouter(apiRouter, cont.MessagesController, cont.UserService)
+				ImageRouter(apiRouter, cont.ImageController, cont.ImageService)
 
 				apiRouter.Handle("/*", NotFoundJSON())
 			})
@@ -119,17 +121,17 @@ func UserRouter(r chi.Router, uc controllers.UserController, us app.UserService)
 }
 
 func ContactsRouter(r chi.Router, cc controllers.ContactsController, us app.UserService) {
-	uom := middlewares.PathObject("id", controllers.PathUserKey, us)
+	com := middlewares.PathObject("id", controllers.PathUserKey, us)
 	r.Route("/contacts", func(apiRouter chi.Router) {
 		apiRouter.Get(
 			"/my",
 			cc.FindAllMy(),
 		)
-		apiRouter.With(uom).Delete(
+		apiRouter.With(com).Delete(
 			"/{id}",
 			cc.Delete(),
 		)
-		apiRouter.With(uom).Get(
+		apiRouter.With(com).Get(
 			"/{id}",
 			cc.FindOne(),
 		)
@@ -141,6 +143,26 @@ func ContactsRouter(r chi.Router, cc controllers.ContactsController, us app.User
 		//	"/",
 		//	cc.FindAll(),
 		//)
+	})
+}
+func ImageRouter(r chi.Router, ic controllers.ImageController, is app.ImageService) {
+	ipom := middlewares.PathObject("imgName", controllers.PathImgKey, is)
+	omw := middlewares.IsOwnerMiddleware(controllers.PathImgKey, domain.Image{})
+	amw := middlewares.HaveAccessMiddleware(controllers.PathImgKey, domain.Image{})
+
+	r.Route("/images", func(apiRouter chi.Router) {
+		apiRouter.Post(
+			"/",
+			ic.AddImage(),
+		)
+		apiRouter.With(ipom, omw).Delete(
+			"/{imgId}",
+			ic.DeleteImage(),
+		)
+		apiRouter.With(ipom, amw).Get(
+			"/{imgName}",
+			ic.FindOne(),
+		)
 	})
 }
 func MessagesRouter(r chi.Router, cc controllers.MessagesController, us app.UserService) {

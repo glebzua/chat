@@ -3,7 +3,7 @@ package app
 import (
 	"chatprjkt/internal/domain"
 	"chatprjkt/internal/infra/database"
-	"chatprjkt/internal/infra/resources"
+	"chatprjkt/internal/infra/http/resources"
 	"fmt"
 	"log"
 )

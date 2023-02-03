@@ -4,6 +4,7 @@ import (
 	"chatprjkt/config"
 	"chatprjkt/internal/app"
 	"chatprjkt/internal/infra/database"
+	"chatprjkt/internal/infra/filesystem"
 	"chatprjkt/internal/infra/http/controllers"
 	"chatprjkt/internal/infra/http/middlewares"
 	"github.com/go-chi/jwtauth/v5"
@@ -29,6 +30,7 @@ type Services struct {
 	app.ContactsService
 	app.MessagesService
 	app.PusherService
+	app.ImageService
 }
 
 type Controllers struct {
@@ -37,6 +39,7 @@ type Controllers struct {
 	controllers.ContactsController
 	controllers.MessagesController
 	controllers.PusherController
+	controllers.ImageController
 }
 
 func New(conf config.Configuration) Container {
@@ -48,12 +51,15 @@ func New(conf config.Configuration) Container {
 	messagesRepository := database.NewMessagesRepository(sess)
 	sessionRepository := database.NewSessRepository(sess)
 	pusherRepository := database.NewPusherRepository(conf.Pusher)
+	imageRepository := database.NewImageRepository(sess)
 
 	pusherService := app.NewPusherService(pusherRepository)
 	userService := app.NewUserService(userRepository, pusherService)
 	contactsService := app.NewContactsService(contactsRepository)
 	messagesService := app.NewMessagesService(messagesRepository, contactsService, pusherService)
 	authService := app.NewAuthService(sessionRepository, userService, conf, tknAuth)
+	imageStorageService := filesystem.NewImageStorageService(conf.FileStorageLocation)
+	imageService := app.NewImageService(imageRepository, imageStorageService, messagesService)
 
 	authMiddleware := middlewares.AuthMiddleware(tknAuth, authService, userService)
 
@@ -62,6 +68,7 @@ func New(conf config.Configuration) Container {
 	contactsController := controllers.NewContactsController(contactsService)
 	messagesController := controllers.NewMessagesController(messagesService)
 	pusherController := controllers.NewPusherController(pusherService)
+	imageController := controllers.NewImageController(imageService)
 	return Container{
 		Middlewares: Middlewares{
 			AuthMw: authMiddleware,
@@ -72,6 +79,7 @@ func New(conf config.Configuration) Container {
 			contactsService,
 			messagesService,
 			pusherService,
+			imageService,
 		},
 		Controllers: Controllers{
 			userController,
@@ -79,6 +87,7 @@ func New(conf config.Configuration) Container {
 			contactsController,
 			messagesController,
 			pusherController,
+			imageController,
 		},
 	}
 }
