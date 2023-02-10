@@ -28,6 +28,7 @@ func HaveAccessMiddleware[domainType Userable](key string, _ domainType) func(ht
 		return http.HandlerFunc(hfn)
 	}
 }
+
 func IsOwnerMiddleware[domainType Userable](key string, _ domainType) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		hfn := func(w http.ResponseWriter, r *http.Request) {

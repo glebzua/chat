@@ -1,13 +1,17 @@
 package filesystem
 
 import (
+	"encoding/base64"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"path"
 )
 
 type ImageStorageService interface {
 	SaveImage(filename string, content []byte) error
+	ReadFileFromStorage(filePath string) (string, error)
 }
 
 type imageStorageService struct {
@@ -44,4 +48,34 @@ func writeFileToStorage(location string, file []byte) error {
 		return err
 	}
 	return nil
+}
+
+func (s imageStorageService) ReadFileFromStorage(filePath string) (string, error) {
+	bytes, err := ioutil.ReadFile("file_storage/" + filePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var base64Encoding string
+
+	// Determine the content type of the image file
+	mimeType := http.DetectContentType(bytes)
+
+	// Prepend the appropriate URI scheme header depending
+	// on the MIME type
+	switch mimeType {
+	case "image/jpeg":
+		base64Encoding += "data:image/jpeg;base64,"
+	case "image/png":
+		base64Encoding += "data:image/png;base64,"
+	}
+
+	// Append the base64 encoded output
+	base64Encoding += toBase64(bytes)
+
+	// Print the full base64 representation of the image
+	return base64Encoding, err
+}
+func toBase64(b []byte) string {
+	return base64.StdEncoding.EncodeToString(b)
 }

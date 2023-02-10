@@ -43,11 +43,14 @@ func created(w http.ResponseWriter, body interface{}) {
 	}
 }
 
-func createdImage(w http.ResponseWriter, data []byte) {
+func createdImage(w http.ResponseWriter, body interface{}) {
 	//w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Content-Type", "application/octet-stream")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Write(data)
+	err := json.NewEncoder(w).Encode(body)
+	if err != nil {
+		log.Print(err)
+	}
 
 }
 func noContent(w http.ResponseWriter) {

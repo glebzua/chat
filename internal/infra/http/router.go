@@ -159,9 +159,13 @@ func ImageRouter(r chi.Router, ic controllers.ImageController, is app.ImageServi
 			"/{imgId}",
 			ic.DeleteImage(),
 		)
+		//apiRouter.With(ipom, amw).Get(
+		//	"/{imgName}",
+		//	ic.FindById(),
+		//)
 		apiRouter.With(ipom, amw).Get(
 			"/{imgName}",
-			ic.FindOne(),
+			ic.FindById(),
 		)
 	})
 }

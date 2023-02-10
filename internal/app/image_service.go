@@ -4,13 +4,14 @@ import (
 	"chatprjkt/internal/domain"
 	"chatprjkt/internal/infra/database"
 	"chatprjkt/internal/infra/filesystem"
+	"fmt"
 	"log"
 )
 
 type ImageService interface {
 	Save(image domain.Image, content []byte) (domain.Image, error)
 	FindById(id int64) (domain.Image, error)
-	FindByName(name string) (domain.Image, error)
+	FindByName(name string) (string, error)
 	FindAll(objId int64, objType string) ([]domain.Image, error)
 	Delete(id int64) error
 	DeleteAll(objId int64, objType string) error
@@ -50,7 +51,7 @@ func (s imageService) Save(image domain.Image, content []byte) (domain.Image, er
 	msg.SenderId = img.SenderId
 	msg.RecipientId = img.RecipientId
 	msg.ChatId = img.ChatId
-	msg.FileLoc = img.Name
+	msg.FileLoc = fmt.Sprintf("%v", img.Id)
 	s.messagesService.Save(msg)
 	return img, nil
 }
@@ -98,9 +99,18 @@ func (s imageService) FindById(id int64) (domain.Image, error) {
 	return s.repo.FindById(id)
 }
 
-func (s imageService) FindByName(name string) (domain.Image, error) {
-	return s.repo.FindByName(name)
+func (s imageService) FindByName(name string) (string, error) {
+	img, err := s.filesys.ReadFileFromStorage(name)
+	if err != nil {
+		log.Print(err)
+		return img, err
+	}
+	return img, err
 }
+
+//func (s imageService) FindByName(name string) (domain.Image, error) {
+//	return s.repo.FindByName(name)
+//}
 
 func (s imageService) Delete(id int64) error {
 	return s.repo.Delete(id)

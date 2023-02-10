@@ -48,7 +48,7 @@ func (c ImageController) AddImage() http.HandlerFunc {
 
 		filetype := http.DetectContentType(buff)
 		if filetype != "image/jpeg" && filetype != "image/png" {
-			err = errors.New("this file format is not allowed. upload JPEG or PNG")
+			err = errors.New("this file format is not allowed. upload JPEG or PNG ")
 			Forbidden(w, err)
 			return
 		}
@@ -87,17 +87,37 @@ func (c ImageController) DeleteImage() http.HandlerFunc {
 		ok(w)
 	}
 }
-func (c ImageController) FindOne() http.HandlerFunc {
+
+//func (c ImageController) FindById() http.HandlerFunc {
+//	return func(w http.ResponseWriter, r *http.Request) {
+//		img := r.Context().Value(PathImgKey).(domain.Image)
+//
+//		i, err := c.service.FindById(img.Id)
+//		if err != nil {
+//			log.Printf("imageController FindOne: %s", err)
+//			InternalServerError(w, err)
+//			return
+//		}
+//		var imageDto resources.ImageDto
+//		//buff, err := io.ReadAll(r.Body)
+//		//createdImage(w, buff)
+//		created(w, imageDto.DomainToDto(i))
+//	}
+//}
+
+func (c ImageController) FindById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		img := r.Context().Value(PathImgKey).(domain.Image)
 
 		i, err := c.service.FindByName(img.Name)
 		if err != nil {
-			log.Printf("imageController FindOne: %s", err)
+			log.Printf("imageController FindByName: %s", err)
 			InternalServerError(w, err)
 			return
 		}
-		var imageDto resources.ImageDto
-		created(w, imageDto.DomainToDto(i))
+		//var imageDto resources.ImageDto
+		//buff, err := io.ReadAll(r.Body)
+		createdImage(w, i)
+		//created(w, imageDto.DomainToDto(i))
 	}
 }
