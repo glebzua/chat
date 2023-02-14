@@ -92,14 +92,19 @@ func (c MessagesController) FindAllMessagesInChat() http.HandlerFunc {
 			BadRequest(w, fmt.Errorf(" messagesController: %v", chatId))
 			return
 		}
+		page, err := strconv.Atoi(r.URL.Query().Get("page"))
+		if err != nil {
+			log.Println("messagesController FindAll error: ", page)
+			BadRequest(w, fmt.Errorf(" messagesController: %v", page))
+			return
+		}
 		user := r.Context().Value(UserKey).(domain.User)
-		msg, err := (c.messagesService).FindAllMessagesInChat(user.Id, chatId)
+		msg, err := (c.messagesService).FindAllMessagesInChat(user.Id, chatId, 20, uint(page))
 		if err != nil {
 			log.Print(err)
 			InternalServerError(w, err)
 			return
 		}
-
 		var MessageDto resources.MessageDto
 		success(w, MessageDto.DomainToDtoCollection(msg))
 

@@ -20,6 +20,8 @@ type Message struct {
 
 type Messages struct {
 	Items []Message
+	Total uint64
+	Pages uint64
 }
 type Chat struct {
 	Id          int64

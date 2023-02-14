@@ -188,6 +188,10 @@ func MessagesRouter(r chi.Router, cc controllers.MessagesController, us app.User
 			"/chat",
 			cc.FindAllMessagesInChat(),
 		)
+		apiRouter.Get(
+			"/chat/page",
+			cc.FindAllMessagesInChat(),
+		)
 		apiRouter.With(uom).Delete(
 			"/{id}",
 			cc.Delete(),
@@ -200,10 +204,10 @@ func MessagesRouter(r chi.Router, cc controllers.MessagesController, us app.User
 			"/",
 			cc.Create(),
 		)
-		apiRouter.Get(
-			"/",
-			cc.FindAll(),
-		)
+		//apiRouter.Get(
+		//	"/",
+		//	cc.FindAll(),
+		//)
 	})
 }
 func NotFoundJSON() http.HandlerFunc {

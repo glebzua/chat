@@ -25,7 +25,9 @@ type ChatDto struct {
 }
 
 type MessagesDto struct {
-	message []MessageDto
+	Message []MessageDto
+	Pages   uint64 `json:"pages"`
+	Total   uint64 `json:"total"`
 }
 type ChatsDto struct {
 	chat []ChatDto
@@ -53,7 +55,7 @@ func (d ChatDto) DomainToDto(chat domain.Chat) ChatDto {
 		RecipientId: chat.RecipientId,
 	}
 }
-func (d MessageDto) DomainToDtoCollection(u domain.Messages) []MessageDto {
+func (d MessageDto) DomainToDtoCollection(u domain.Messages) MessagesDto {
 	var result []MessageDto
 
 	for _, c := range u.Items {
@@ -62,7 +64,11 @@ func (d MessageDto) DomainToDtoCollection(u domain.Messages) []MessageDto {
 		result = append(result, messageDto)
 	}
 
-	return result
+	return MessagesDto{
+		Message: result,
+		Total:   u.Total,
+		Pages:   u.Pages,
+	}
 }
 
 func (d ChatDto) DomainToDtoCollection(u domain.Chats) []ChatDto {

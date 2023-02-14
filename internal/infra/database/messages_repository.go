@@ -4,6 +4,7 @@ import (
 	"chatprjkt/internal/domain"
 	"fmt"
 	"github.com/upper/db/v4"
+	"log"
 	"time"
 )
 
@@ -27,10 +28,9 @@ type MessagesRepository interface {
 	Save(domainItem domain.Message) (domain.Message, error)
 	FindAll(pageSize, page uint) (domain.Messages, error)
 	FindAllForId(id string) (domain.Messages, error)
-	FindAllMessagesInChat(id int64, chatId string) (domain.Messages, error)
+	FindAllMessagesInChat(id int64, chatId string, pageSize, page uint) (domain.Messages, error)
 	FindById(id int64) (domain.Message, error)
 	FindAllChatsWithUnreadMsg(chatId string, userId int64) (domain.Message, error)
-
 	Delete(id int64) error
 	MarkReceivedMessages(id int64, chatId string) error
 }
@@ -105,18 +105,28 @@ func (r messagesRepository) FindAllChatsWithUnreadMsg(chatId string, userId int6
 	//return domain.Chats{}, nil
 }
 
-func (r messagesRepository) FindAllMessagesInChat(userId int64, chatId string) (domain.Messages, error) {
+func (r messagesRepository) FindAllMessagesInChat(userId int64, chatId string, pageSize, page uint) (domain.Messages, error) {
 	var message []messages
 	messageCond := db.Cond{"chatid": chatId}
-	err := r.coll.Find(messageCond).OrderBy("-created_date").All(&message)
+	totalCount, err := r.coll.Find(messageCond).Count()
 	if err != nil {
+		log.Print(err)
+		return domain.Messages{}, err
+	}
+	err = r.coll.Find(messageCond).OrderBy("-created_date").Paginate(pageSize).Page(page).All(&message)
+
+	if err != nil {
+		log.Print(err)
 		return domain.Messages{}, err
 	}
 	err = r.MarkReceivedMessages(userId, chatId)
 	if err != nil {
 		return domain.Messages{}, err
 	}
-	return r.mapModelToDomainCollection(message), nil
+	res := r.mapModelToDomainCollection(message)
+	res.Total = totalCount
+	res.Pages = (totalCount-(totalCount%uint64(pageSize)))/uint64(pageSize) + 1
+	return res, nil
 }
 func (r messagesRepository) MarkReceivedMessages(recipientId int64, chatId string) error {
 

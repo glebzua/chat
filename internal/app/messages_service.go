@@ -11,7 +11,7 @@ import (
 type MessagesService interface {
 	FindAll(pageSize, page uint) (domain.Messages, error)
 	FindAllForId(id int64) (domain.Messages, error)
-	FindAllMessagesInChat(userId int64, chatId string) (domain.Messages, error)
+	FindAllMessagesInChat(userId int64, chatId string, pageSize, page uint) (domain.Messages, error)
 	Save(item domain.Message) (domain.Message, error)
 	Find(id int64) (interface{}, error)
 	FindById(id int64) (domain.Message, error)
@@ -64,8 +64,8 @@ func (s messagesService) FindAll(pageSize, page uint) (domain.Messages, error) {
 	return contacts, nil
 }
 
-func (s messagesService) FindAllMessagesInChat(id int64, chatId string) (domain.Messages, error) {
-	messages, err := s.messagesRepo.FindAllMessagesInChat(id, chatId)
+func (s messagesService) FindAllMessagesInChat(id int64, chatId string, pageSize, page uint) (domain.Messages, error) {
+	messages, err := s.messagesRepo.FindAllMessagesInChat(id, chatId, pageSize, page)
 	if err != nil {
 		log.Printf("messagesService: %s", err)
 		return domain.Messages{}, err
