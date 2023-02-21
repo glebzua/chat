@@ -1,0 +1,2 @@
+alter table messages
+    rename column sended to send;

@@ -11,7 +11,7 @@ type Message struct {
 	RecipientId int64
 	Message     string
 	FileLoc     string
-	Sended      bool
+	Send        bool
 	Received    bool
 	CreatedDate time.Time
 	UpdatedDate time.Time
@@ -29,7 +29,7 @@ type Chat struct {
 	SenderId    int64
 	RecipientId int64
 	Message     string
-	Sended      bool
+	Send        bool
 	Received    bool
 	CreatedDate time.Time
 	UpdatedDate time.Time

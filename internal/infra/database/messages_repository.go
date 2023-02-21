@@ -17,7 +17,7 @@ type messages struct {
 	RecipientId int64      `db:"recipientid"`
 	Message     string     `db:"message"`
 	FileLoc     string     `db:"fileloc"`
-	Sended      bool       `db:"sended"`
+	Send        bool       `db:"send"`
 	Received    bool       `db:"received"`
 	CreatedDate time.Time  `db:"created_date,omitempty"`
 	UpdatedDate time.Time  `db:"updated_date,omitempty"`
@@ -48,7 +48,7 @@ func (r messagesRepository) Save(domainMessages domain.Message) (domain.Message,
 	s := r.mapDomainToModel(domainMessages)
 	s.CreatedDate = time.Now()
 	s.UpdatedDate = time.Now()
-	s.Sended = true
+	s.Send = true
 	err := r.coll.InsertReturning(&s)
 	if err != nil {
 		return domain.Message{}, fmt.Errorf("Messages repository Save: %w", err)
@@ -161,7 +161,7 @@ func (r messagesRepository) mapDomainToModel(d domain.Message) messages {
 		RecipientId: d.RecipientId,
 		Message:     d.Message,
 		FileLoc:     d.FileLoc,
-		Sended:      d.Sended,
+		Send:        d.Send,
 		Received:    d.Received,
 		CreatedDate: d.CreatedDate,
 		UpdatedDate: d.UpdatedDate,
@@ -177,7 +177,7 @@ func (r messagesRepository) mapModelToDomain(m messages) domain.Message {
 		RecipientId: m.RecipientId,
 		Message:     m.Message,
 		FileLoc:     m.FileLoc,
-		Sended:      m.Sended,
+		Send:        m.Send,
 		Received:    m.Received,
 		CreatedDate: m.CreatedDate,
 		UpdatedDate: m.UpdatedDate,

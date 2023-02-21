@@ -12,7 +12,7 @@ type MessageDto struct {
 	RecipientId int64      `json:"recipientId"`
 	Message     string     `json:"message"`
 	FileLoc     string     `json:"fileloc"`
-	Sended      bool       `json:"sended"`
+	Send        bool       `json:"send"`
 	Received    bool       `json:"received"`
 	CreatedDate time.Time  `json:"createdDate"`
 	UpdatedDate time.Time  `json:"updatedDate"`
@@ -41,7 +41,7 @@ func (d MessageDto) DomainToDto(message domain.Message) MessageDto {
 		RecipientId: message.RecipientId,
 		FileLoc:     message.FileLoc,
 		Message:     message.Message,
-		Sended:      message.Sended,
+		Send:        message.Send,
 		Received:    message.Received,
 		CreatedDate: message.CreatedDate,
 		UpdatedDate: message.UpdatedDate,

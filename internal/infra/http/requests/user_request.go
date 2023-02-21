@@ -8,19 +8,11 @@ type UserRequest struct {
 	PhoneNumber string `json:"phoneNumber"`
 }
 
-type CreateRequest struct {
-	Email       string `json:"email" validate:"required,email"`
-	Password    string `json:"password" validate:"required,alphanum,gte=6"`
-	Name        string `json:"name" validate:"required"`
-	PhoneNumber string `json:"phoneNumber" validate:"required"`
-	Nickname    string `json:"nickname" validate:"required"`
-}
-
 type RegisterRequest struct {
 	Email       string `json:"email" validate:"required,email"`
 	Password    string `json:"password" validate:"required,alphanum,gte=6"`
 	Name        string `json:"name" validate:"required"`
-	PhoneNumber string `json:"phoneNumber" validate:"required"`
+	PhoneNumber string `json:"phoneNumber" `
 	//Nickname    string `json:"nickname" validate:"required"`
 }
 
@@ -37,15 +29,6 @@ type ChangePasswordRequest struct {
 func (r UserRequest) ToDomainModel() (interface{}, error) {
 	return domain.User{
 		Email:       r.Email,
-		Name:        r.Name,
-		PhoneNumber: r.PhoneNumber,
-	}, nil
-}
-
-func (r CreateRequest) ToDomainModel() (interface{}, error) {
-	return domain.User{
-		Email:       r.Email,
-		Password:    r.Password,
 		Name:        r.Name,
 		PhoneNumber: r.PhoneNumber,
 	}, nil
